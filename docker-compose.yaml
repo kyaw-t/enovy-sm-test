@@ -1,0 +1,27 @@
+services:
+  ext-proc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: "host"
+    environment:
+      - LISTEN_ADDR=:9001
+      - SECRET_ID=lab/envoy-sds-test
+      - SECRET_JSON_KEY=api-key
+      - SECRET_TTL=5m
+      # Override individual thresholds (optional)
+      # - VERTEX_SAFETY_HARASSMENT=BLOCK_LOW_AND_ABOVE
+      # - VERTEX_SAFETY_HATE_SPEECH=BLOCK_MEDIUM_AND_ABOVE
+      # - VERTEX_SAFETY_SEXUALLY_EXPLICIT=BLOCK_LOW_AND_ABOVE
+      # - VERTEX_SAFETY_DANGEROUS_CONTENT=BLOCK_MEDIUM_AND_ABOVE
+      #
+      # Or override all at once as JSON (optional)
+      # - VERTEX_SAFETY_SETTINGS=[{"category":"HARM_CATEGORY_HARASSMENT","threshold":"BLOCK_ONLY_HIGH"}]
+
+  envoy:
+    image: envoyproxy/envoy:v1.32-latest
+    network_mode: "host"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml:ro
+    depends_on:
+      - ext-proc
