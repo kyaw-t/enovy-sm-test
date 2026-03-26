@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	extprocfilterv3 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ext_proc/v3"
 	extprocv3 "github.com/envoyproxy/go-control-plane/envoy/service/ext_proc/v3"
 )
 
@@ -76,7 +77,7 @@ func (p *VertexProcessor) handleRequestHeaders(ctx context.Context, headers *ext
 	var currentPath string
 	for _, h := range headers.Headers.Headers {
 		if h.Key == ":path" {
-			currentPath = h.RawValue
+			currentPath = string(h.RawValue)
 			if currentPath == "" {
 				currentPath = h.Value
 			}
@@ -110,8 +111,8 @@ func (p *VertexProcessor) handleRequestHeaders(ctx context.Context, headers *ext
 			},
 		},
 		// Tell envoy to send us the body in BUFFERED mode
-		ModeOverride: &extprocv3.ProcessingMode{
-			RequestBodyMode: extprocv3.ProcessingMode_BUFFERED,
+		ModeOverride: &extprocfilterv3.ProcessingMode{
+			RequestBodyMode: extprocfilterv3.ProcessingMode_BUFFERED,
 		},
 	}, nil
 }
